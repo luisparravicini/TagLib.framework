@@ -29,6 +29,25 @@ void Init_TagLibBundle(void) { }
 
 @synthesize length, sampleRate, bitRate;
 
+
+- (NSString*)stringValueFor:(const char*) value {
+    NSString *result = nil;
+    
+    if (value != NULL && strlen(value) > 0)
+        result = [NSString stringWithUTF8String:value];
+    
+    return result;
+}
+
+-(NSNumber*)intValueFor:(unsigned int) value {
+    NSNumber *result = nil;
+    
+    if (value > 0)
+        result = [NSNumber numberWithUnsignedInt:value];
+    
+    return result;
+}
+
 - (id)initWithFileAtPath:(NSString *)filePath {
     if (self = [super init]) {
 
@@ -52,44 +71,13 @@ void Init_TagLibBundle(void) { }
                 
                 self.validTags = YES;
                 
-                if (taglib_tag_title(tag) != NULL &&
-                    strlen(taglib_tag_title(tag)) > 0) {
-                    self.title = [NSString stringWithCString:taglib_tag_title(tag)
-                                                    encoding:NSUTF8StringEncoding];
-                }
-                
-                if (taglib_tag_artist(tag) != NULL &&
-                    strlen(taglib_tag_artist(tag)) > 0) {
-                    self.artist = [NSString stringWithCString:taglib_tag_artist(tag)
-                                                     encoding:NSUTF8StringEncoding];
-                }
-                
-                if (taglib_tag_album(tag) != NULL &&
-                    strlen(taglib_tag_album(tag)) > 0) {
-                    self.album = [NSString stringWithCString:taglib_tag_album(tag)
-                                                    encoding:NSUTF8StringEncoding];
-                }
-                
-                if (taglib_tag_comment(tag) != NULL &&
-                    strlen(taglib_tag_comment(tag)) > 0) {
-                    self.comment = [NSString stringWithCString:taglib_tag_comment(tag)
-                                                      encoding:NSUTF8StringEncoding];
-                }
-                
-                if (taglib_tag_genre(tag) != NULL &&
-                    strlen(taglib_tag_genre(tag)) > 0) {
-                    self.genre = [NSString stringWithCString:taglib_tag_genre(tag)
-                                                    encoding:NSUTF8StringEncoding];
-                }
-                
-                // Year and track are uints
-                if (taglib_tag_year(tag) > 0) {
-                    self.year = [NSNumber numberWithUnsignedInt:taglib_tag_year(tag)];
-                }
-                
-                if (taglib_tag_track(tag) > 0) {
-                    self.track = [NSNumber numberWithUnsignedInt:taglib_tag_track(tag)];
-                }
+                self.title = [self stringValueFor: taglib_tag_title(tag)];
+                self.artist = [self stringValueFor: taglib_tag_artist(tag)];
+                self.album = [self stringValueFor: taglib_tag_album(tag)];
+                self.comment = [self stringValueFor: taglib_tag_comment(tag)];
+                self.genre = [self stringValueFor: taglib_tag_genre(tag)];
+                self.year = [self intValueFor: taglib_tag_year(tag)];
+                self.track = [self intValueFor: taglib_tag_track(tag)];
             } else {
                 self.validTags = NO;
             }
